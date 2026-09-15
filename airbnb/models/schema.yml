@@ -80,3 +80,36 @@ models:
           data_type: timestamp    # this block confiures this test to be a contract
           data_tests:
             - not_null
+    
+
+    - name: dim_listings_with_hosts
+      tests:
+          # basically added a test from dbt_expectations package to check if 
+          #  the row count of this model is equal to the row count of the source table
+        - dbt_expectations.expect_table_row_count_to_equal_other_table: 
+            compare_model: source('airbnb', 'listings')
+      columns:
+        - name: price
+          # This test checks if the 99th percentile of the price column is between 50 and 500
+          # This is to ensure that the price column does not have any outliers that are too
+          tests:
+            - dbt_expectations.expect_column_quantile_values_to_be_between:
+                quantile: .99
+                min_value: 50
+                max_value: 500 
+
+            # This test checks for the maximum value of the price column 
+            # to be between 1 and 5000 to ensure
+            # the config has been set to warn if the test fails instead of failing the build
+            - dbt_expectations.expect_column_max_to_be_between:
+                min_value: 1 
+                max_value: 5000 
+                config:
+                  severity: warn
+            
+            # checks that the format of the price column is a number
+            - dbt_expectations.expect_column_values_to_be_of_type:
+                column_type: number
+
+
+         
