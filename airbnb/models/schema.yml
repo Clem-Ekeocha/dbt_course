@@ -37,6 +37,20 @@ models:
             - positive_values
 
     - name: dim_hosts_cleansed
+      versions:
+        - v: 1
+          defined_in: dim_hosts_cleansed
+        - v: 2
+          defined_in: dim_hosts_cleansed_v2
+          columns:
+          - include: '*'
+            exclude: [host_name]
+          - name: host_name
+            description: The name of the host (N/A if not available)
+            data_type: string
+            constraints:
+              - type: not_null
+      latest_version: 1
       config:                # this block confiures this test to be a contract
         contract:
           enforced: true        # this block confiures this test to be a contract
